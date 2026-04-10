@@ -11,9 +11,10 @@ const searchButton = document.getElementById('searchButton');
  */
 async function searchNearby(event) {
   event.preventDefault();
+  performSearch(postcodeInput.value.trim());
+}
 
-  const postcode = postcodeInput.value.trim();
-
+async function performSearch(postcode) {
   if (!postcode) {
     showMessage('Please enter a postcode before searching.');
     postcodeInput.focus();
@@ -36,12 +37,12 @@ async function searchNearby(event) {
     }
 
     if (!response.ok) {
-      showMessage((data && data.error) || 'Unable to fetch search results.');
+      showMessage((data && data.error) || 'Unable to fetch search results.', true);
       return;
     }
 
     if (!data || data.error) {
-      showMessage(data?.error || 'Unable to fetch search results.');
+      showMessage(data?.error || 'Unable to fetch search results.', true);
       return;
     }
 
@@ -57,12 +58,16 @@ async function searchNearby(event) {
     resultsHeader.classList.remove('hidden');
     renderResults(data.results);
   } catch (error) {
-    showMessage('Something went wrong while searching. Please try again.');
+    showMessage('Something went wrong while searching. Please try again.', true);
     // eslint-disable-next-line no-console
     console.error('Search error:', error);
   } finally {
     toggleSearchButton(false);
   }
+}
+
+function retrySearch() {
+  performSearch(postcodeInput.value.trim());
 }
 
 function toggleSearchButton(isLoading) {
@@ -84,9 +89,21 @@ function showLoading() {
 /**
  * Render an inline status message for the result area.
  */
-function showMessage(message) {
+function showMessage(message, showRetry = false) {
   resultsHeader.classList.add('hidden');
-  resultsContainer.innerHTML = `<div class="result-message">${escapeHtml(message)}</div>`;
+  resultsContainer.innerHTML = `
+    <div class="result-message">
+      <span>${escapeHtml(message)}</span>
+      ${showRetry ? '<button type="button" class="retry-button">Try again</button>' : ''}
+    </div>
+  `;
+
+  if (showRetry) {
+    const retryButton = resultsContainer.querySelector('.retry-button');
+    if (retryButton) {
+      retryButton.addEventListener('click', retrySearch);
+    }
+  }
 }
 
 /**
