@@ -78,7 +78,7 @@ function toggleSearchButton(isLoading) {
  * Display a loading state while the API request is pending.
  */
 function showLoading() {
-  resultsContainer.innerHTML = '<div class="loading">Searching attractions…</div>';
+  resultsContainer.innerHTML = '<div class="loading"><span class="loading-spinner" aria-hidden="true"></span>Searching attractions…</div>';
 }
 
 /**
