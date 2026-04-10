@@ -26,10 +26,22 @@ async function searchNearby(event) {
 
   try {
     const response = await fetch(`api/postcode.php?postcode=${encodeURIComponent(postcode)}`);
-    const data = await response.json();
+    const payload = await response.text();
+    let data = null;
 
-    if (!response.ok || data.error) {
-      showMessage(data.error || 'Unable to fetch search results.');
+    try {
+      data = JSON.parse(payload);
+    } catch {
+      // Invalid JSON from API
+    }
+
+    if (!response.ok) {
+      showMessage((data && data.error) || 'Unable to fetch search results.');
+      return;
+    }
+
+    if (!data || data.error) {
+      showMessage(data?.error || 'Unable to fetch search results.');
       return;
     }
 
