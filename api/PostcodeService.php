@@ -59,18 +59,7 @@ class PostcodeService
             throw new RuntimeException('Unable to resolve postcode. Please try a different postcode.');
         }
 
-        $response = json_decode($payload, true);
-        $data = $response['data'] ?? $response['result'] ?? null;
-
-        if (!is_array($data) || empty($data['latitude']) || empty($data['longitude'])) {
-            throw new RuntimeException('Unable to resolve postcode. Please try a different postcode.');
-        }
-
-        $geocode = [
-            'postcode' => $data['postcode'] ?? $postcode,
-            'latitude' => (float)$data['latitude'],
-            'longitude' => (float)$data['longitude'],
-        ];
+        $geocode = $this->parsePostcodeApiResponse($payload, $postcode);
 
         $this->storeGeocodeCache($cacheKey, $geocode);
         return $geocode;
@@ -111,6 +100,25 @@ class PostcodeService
     private function getCacheFile(string $cacheKey): string
     {
         return self::CACHE_DIR . '/' . rawurlencode($cacheKey) . '.json';
+    }
+
+    private function parsePostcodeApiResponse(string $payload, string $postcode): array
+    {
+        $response = json_decode($payload, true);
+        if ($response === null || json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Postcode lookup returned invalid data.');
+        }
+
+        $data = $response['data'] ?? $response['result'] ?? null;
+        if (!is_array($data) || !isset($data['latitude'], $data['longitude'])) {
+            throw new RuntimeException('Unable to resolve postcode. Please try a different postcode.');
+        }
+
+        return [
+            'postcode' => $data['postcode'] ?? $postcode,
+            'latitude' => (float)$data['latitude'],
+            'longitude' => (float)$data['longitude'],
+        ];
     }
 
     private function loadAttractions(): array
