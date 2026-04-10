@@ -9,8 +9,8 @@
 
       <form id="postcodeSearchForm" class="search-card" onsubmit="searchNearby(event)">
         <label for="postcodeInput" class="visually-hidden">Postcode</label>
-        <input id="postcodeInput" class="postcode-input" type="text" placeholder="Enter postcode (e.g. EH1 1JJ)" autocomplete="postal-code" />
-        <button type="submit" class="search-button">Search</button>
+        <input id="postcodeInput" class="postcode-input" type="search" placeholder="Enter postcode (e.g. EH1 1JJ)" autocomplete="postal-code" />
+        <button id="searchButton" type="submit" class="search-button">Search</button>
       </form>
     </div>
   </section>

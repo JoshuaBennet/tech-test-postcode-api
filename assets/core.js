@@ -2,6 +2,7 @@ const postcodeInput = document.getElementById('postcodeInput');
 const resultsContainer = document.getElementById('resultsContainer');
 const resultsHeader = document.getElementById('resultsHeader');
 const searchPostcode = document.getElementById('searchPostcode');
+const searchButton = document.getElementById('searchButton');
 
 /**
  * Handle search form submission and fetch nearby attractions.
@@ -18,6 +19,7 @@ async function searchNearby(event) {
     return;
   }
 
+  toggleSearchButton(true);
   resultsHeader.classList.add('hidden');
   showLoading();
 
@@ -42,7 +44,18 @@ async function searchNearby(event) {
     showMessage('Something went wrong while searching. Please try again.');
     // eslint-disable-next-line no-console
     console.error('Search error:', error);
+  } finally {
+    toggleSearchButton(false);
   }
+}
+
+function toggleSearchButton(isLoading) {
+  if (!searchButton) {
+    return;
+  }
+
+  searchButton.disabled = isLoading;
+  searchButton.textContent = isLoading ? 'Searching…' : 'Search';
 }
 
 /**
