@@ -4,6 +4,7 @@ const resultsHeader = document.getElementById('resultsHeader');
 const resultsCount = document.getElementById('resultsCount');
 const searchPostcode = document.getElementById('searchPostcode');
 const searchButton = document.getElementById('searchButton');
+const LAST_POSTCODE_KEY = 'exploreNearbyLastPostcode';
 
 /**
  * Handle search form submission and fetch nearby attractions.
@@ -55,6 +56,7 @@ async function performSearch(postcode) {
     if (resultsCount) {
       resultsCount.textContent = `(${data.results.length} attractions found)`;
     }
+    saveLastPostcode(data.postcode);
     resultsHeader.classList.remove('hidden');
     renderResults(data.results);
   } catch (error) {
@@ -138,6 +140,22 @@ function formatDistance(distance) {
   return `${distance.toFixed(1)} miles away`;
 }
 
+function saveLastPostcode(postcode) {
+  try {
+    localStorage.setItem(LAST_POSTCODE_KEY, postcode);
+  } catch {
+    // Ignore storage errors in private mode.
+  }
+}
+
+function restoreLastPostcode() {
+  try {
+    return localStorage.getItem(LAST_POSTCODE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
 function escapeHtml(text) {
   return String(text)
     .replace(/&/g, '&amp;')
@@ -146,3 +164,13 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const lastPostcode = restoreLastPostcode();
+  if (!lastPostcode) {
+    return;
+  }
+
+  postcodeInput.value = lastPostcode;
+  performSearch(lastPostcode);
+});
