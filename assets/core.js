@@ -1,6 +1,7 @@
 const postcodeInput = document.getElementById('postcodeInput');
 const resultsContainer = document.getElementById('resultsContainer');
 const resultsHeader = document.getElementById('resultsHeader');
+const resultsCount = document.getElementById('resultsCount');
 const searchPostcode = document.getElementById('searchPostcode');
 const searchButton = document.getElementById('searchButton');
 
@@ -38,6 +39,9 @@ async function searchNearby(event) {
     }
 
     searchPostcode.textContent = data.postcode;
+    if (resultsCount) {
+      resultsCount.textContent = `(${data.results.length} attractions found)`;
+    }
     resultsHeader.classList.remove('hidden');
     renderResults(data.results);
   } catch (error) {

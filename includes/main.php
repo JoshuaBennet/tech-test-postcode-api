@@ -17,7 +17,10 @@
 
   <section class="results-section">
     <div id="resultsHeader" class="results-header hidden">
-      <p>Results near <strong id="searchPostcode"></strong></p>
+      <p>
+        Results near <strong id="searchPostcode"></strong>
+        <span id="resultsCount" class="results-count"></span>
+      </p>
     </div>
 
     <div id="resultsContainer" class="results-grid" role="status" aria-live="polite">

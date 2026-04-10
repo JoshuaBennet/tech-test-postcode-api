@@ -193,6 +193,12 @@ main {
   font-weight: 600;
 }
 
+.results-count {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
 .results-grid {
   display: grid;
   gap: 1.25rem;
