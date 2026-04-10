@@ -144,7 +144,7 @@ class PostcodeService
     private function buildResults(array $geocode, array $attractions): array
     {
         $results = [];
-        $coordsByPostcode = $this->getAttractionCoordinates();
+        $coordsByPostcode = $this->resolveAttractionCoordinates($attractions);
 
         foreach ($attractions as $attraction) {
             $key = strtoupper(trim($attraction['postcode']));
@@ -192,23 +192,27 @@ class PostcodeService
         return round($earthRadius * $c, 1);
     }
 
-    private function getAttractionCoordinates(): array
+    private function resolveAttractionCoordinates(array $attractions): array
     {
-        return [
-            'EH6 6JJ' => ['latitude' => 55.980053, 'longitude' => -3.179670],
-            'OX1 3BG' => ['latitude' => 51.755125, 'longitude' => -1.254930],
-            'N6 6PJ' => ['latitude' => 51.568609, 'longitude' => -0.147475],
-            'WC1B 3DG' => ['latitude' => 51.519362, 'longitude' => -0.126873],
-            'EH1 2NG' => ['latitude' => 55.948965, 'longitude' => -3.201478],
-            'SE1 2UP' => ['latitude' => 51.503326, 'longitude' => -0.076613],
-            'BA1 1LZ' => ['latitude' => 51.381128, 'longitude' => -2.360105],
-            'SE10 9NF' => ['latitude' => 51.480285, 'longitude' => -0.006019],
-            'SW7 5BD' => ['latitude' => 51.496563, 'longitude' => -0.176892],
-            'SP4 7DE' => ['latitude' => 51.184342, 'longitude' => -1.857404],
-            'YO1 7HH' => ['latitude' => 53.961573, 'longitude' => -1.081910],
-            'PO1 3TT' => ['latitude' => 50.796178, 'longitude' => -1.107970],
-            'PL24 2SG' => ['latitude' => 50.359718, 'longitude' => -4.743157],
-        ];
+        $coordinates = [];
+        $seen = [];
+
+        foreach ($attractions as $attraction) {
+            $postcode = strtoupper(trim($attraction['postcode'] ?? ''));
+            if ($postcode === '' || isset($seen[$postcode])) {
+                continue;
+            }
+
+            $seen[$postcode] = true;
+
+            try {
+                $coordinates[$postcode] = $this->fetchPostcodeCoordinates($postcode);
+            } catch (RuntimeException $exception) {
+                continue; // ignore attractions with invalid or unavailable postcodes
+            }
+        }
+
+        return $coordinates;
     }
 
     private function respondError(string $message): void
