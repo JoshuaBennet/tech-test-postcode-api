@@ -177,6 +177,12 @@ main {
   transform: translateY(-1px);
 }
 
+.search-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .results-section {
   margin-top: 2.75rem;
 }
